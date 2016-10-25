@@ -5,21 +5,21 @@ angular
     .module('angularRouting')
     .service('authenticationService', [
         'appConfig', '$http', '$q', '$location', '$timeout',
-        function (appConfig, $http, $q, $location, $timeout) {
+        function(appConfig, $http, $q, $location, $timeout) {
             this.isUserAuthenticated = false;
             this.pendingPromises = [];
 
             this.userDataPromise = $q.defer();
 
-            this.setUserAuthenticated = function (value) {
+            this.setUserAuthenticated = function(value) {
                 this.isUserAuthenticated = value;
             };
 
-            this.getUserAuthenticated = function () {
+            this.getUserAuthenticated = function() {
                 return this.isUserAuthenticated;
             };
 
-            this.getRequireLoginForPage = function (page) {
+            this.getRequireLoginForPage = function(page) {
                 var index, route;
                 for (index in appConfig.routes) {
                     route = appConfig.routes[index];
@@ -31,7 +31,7 @@ angular
                 return false;
             };
 
-            this.getUserData = function () {
+            this.getUserData = function() {
                 var self = this;
                 var newPromise = $q.defer();
 
@@ -43,7 +43,7 @@ angular
                     cache: false,
                     timeout: newPromise.promise
                 }).then(
-                    function (response) {
+                    function(response) {
                         console.log('Request done!');
                         if (response.data.isLoggedIn) {
                             self.setUserAuthenticated(true);
@@ -52,7 +52,7 @@ angular
                             self.setUserAuthenticated(false);
                             self.userDataPromise.reject('AUTH_REQUIRED');
                         }
-                    }, function () {
+                    }, function() {
                         self.setUserAuthenticated(false);
                         self.userDataPromise.reject('AUTH_REQUIRED');
                     });
@@ -60,7 +60,7 @@ angular
                 return this.userDataPromise.promise;
             };
 
-            this.abortPreviousRequests = function () {
+            this.abortPreviousRequests = function() {
                 var i;
                 for (i = 0; i < this.pendingPromises.length; i++) {
                     console.log(this.pendingPromises[i]);
@@ -69,4 +69,18 @@ angular
                 }
                 this.pendingPromises = [];
             };
-        }]);
+        }])
+    .service('loadingService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+        this.timeoutId = null;
+        this.startLoading = function() {
+            this.timeoutId = $timeout(function() {
+                $rootScope.isLoading = true;
+            }, 500);
+
+        };
+        this.stopLoading = function(){
+            $timeout.cancel(this.timeoutId);
+            $rootScope.isLoading = false;
+        };
+
+    }]);

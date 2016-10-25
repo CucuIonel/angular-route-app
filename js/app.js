@@ -56,18 +56,30 @@ angular.module('angularRouting', ['ngRoute'])
             redirectTo: '/home'
         })
     }])
-    .run(['authenticationService', '$rootScope', '$location', function(authenticationService, $rootScope, $location) {
+    .run(['authenticationService', '$rootScope', '$location', 'loadingService', function(authenticationService, $rootScope, $location, loadingService) {
         $rootScope.$on('$locationChangeSuccess', function() {
-            console.log('Location event fired');
+            console.log('$locationChangeSuccess');
             authenticationService.abortPreviousRequests();
+            loadingService.startLoading();
+        });
+
+        $rootScope.$on('$locationChangeError', function() {
+            console.log('$locationChangeError');
+            loadingService.stopLoading();
         });
 
         $rootScope.$on("$routeChangeError", function(event, current, previous, eventObj) {
-            console.log(eventObj);
+            console.log('$routeChangeError');
+            loadingService.stopLoading();
             if (eventObj === 'AUTH_REQUIRED') {
                 $location.path("/login");
             } else if(eventObj === 'REDIRECT_HOME'){
                 $location.path("/home");
             }
+        });
+
+        $rootScope.$on("$routeChangeSuccess", function(event, current, previous, eventObj) {
+            console.log('$routeChangeSuccess');
+            loadingService.stopLoading();
         });
     }]);
