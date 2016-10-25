@@ -10,19 +10,27 @@ angular.module('angularRouting', ['ngRoute'])
                 path: '/login',
                 controller: 'LoginController',
                 templateUrl: '/templates/login.html',
-                requireLogin: false
+                requireLogin: false,
+                resolve: ['authenticationService', '$q', function(authenticationService, $q) {
+                    console.log('Login resolved to :', !authenticationService.getUserAuthenticated());
+                    if(authenticationService.getUserAuthenticated()){
+                        return $q.reject('REDIRECT_HOME');
+                    } else {
+                        return $q.resolve();
+                    }
+                }]
             }, {
                 path: '/secure-page',
                 controller: 'SecurePageController',
                 templateUrl: '/templates/secure-page.html',
                 requireLogin: true,
-                resolve: ['authenticationService', function (authenticationService) {
+                resolve: ['authenticationService', function(authenticationService) {
                     return authenticationService.getUserData();
                 }]
             }
         ]
     })
-    .config(['$routeProvider', 'appConfig', '$httpProvider', function ($routeProvider, appConfig, $httpProvider) {
+    .config(['$routeProvider', 'appConfig', '$httpProvider', function($routeProvider, appConfig, $httpProvider) {
         var i, route, routeObject;
 
         $httpProvider.defaults.cache = false;
@@ -38,6 +46,9 @@ angular.module('angularRouting', ['ngRoute'])
             if (angular.isDefined(route.resolve)) {
                 routeObject.resolve = route.resolve;
             }
+            if (angular.isDefined(route.resolveRedirectTo)) {
+                routeObject.resolveRedirectTo = route.resolveRedirectTo;
+            }
             $routeProvider.when(route.path, routeObject);
         }
 
@@ -45,9 +56,18 @@ angular.module('angularRouting', ['ngRoute'])
             redirectTo: '/home'
         })
     }])
-    .run(['authenticationService', '$rootScope', function(authenticationService, $rootScope){
-        $rootScope.$on('$locationChangeSuccess', function(){
+    .run(['authenticationService', '$rootScope', '$location', function(authenticationService, $rootScope, $location) {
+        $rootScope.$on('$locationChangeSuccess', function() {
             console.log('Location event fired');
             authenticationService.abortPreviousRequests();
+        });
+
+        $rootScope.$on("$routeChangeError", function(event, current, previous, eventObj) {
+            console.log(eventObj);
+            if (eventObj === 'AUTH_REQUIRED') {
+                $location.path("/login");
+            } else if(eventObj === 'REDIRECT_HOME'){
+                $location.path("/home");
+            }
         });
     }]);

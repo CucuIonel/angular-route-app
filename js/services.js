@@ -46,14 +46,15 @@ angular
                     function (response) {
                         console.log('Request done!');
                         if (response.data.isLoggedIn) {
+                            self.setUserAuthenticated(true);
                             self.userDataPromise.resolve();
                         } else {
-                            self.userDataPromise.reject();
-                            $location.path('/login');
+                            self.setUserAuthenticated(false);
+                            self.userDataPromise.reject('AUTH_REQUIRED');
                         }
                     }, function () {
-                        self.userDataPromise.reject();
-                        $location.path('/login');
+                        self.setUserAuthenticated(false);
+                        self.userDataPromise.reject('AUTH_REQUIRED');
                     });
 
                 return this.userDataPromise.promise;
