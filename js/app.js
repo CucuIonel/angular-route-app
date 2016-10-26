@@ -39,16 +39,13 @@ angular.module('angularRouting', ['ngRoute'])
             route = appConfig.routes[i];
             routeObject = {
                 controller: route.controller,
-                templateUrl: route.templateUrl,
-                cache: false
+                templateUrl: route.templateUrl
             };
 
             if (angular.isDefined(route.resolve)) {
                 routeObject.resolve = route.resolve;
             }
-            if (angular.isDefined(route.resolveRedirectTo)) {
-                routeObject.resolveRedirectTo = route.resolveRedirectTo;
-            }
+
             $routeProvider.when(route.path, routeObject);
         }
 

@@ -1,0 +1,24 @@
+{
+  "name": "angular-route-app",
+  "version": "1.0.0",
+  "description": "Angular app using secured routes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CucuIonel/angular-route-app.git"
+  },
+  "keywords": [
+    "angular",
+    "route",
+    "app"
+  ],
+  "author": "Ionel Cucu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CucuIonel/angular-route-app/issues"
+  },
+  "homepage": "https://github.com/CucuIonel/angular-route-app#readme"
+}
