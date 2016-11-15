@@ -3,30 +3,33 @@ angular.module('angularRouting', ['ngRoute'])
         routes: [
             {
                 path: '/home',
+                pageName: 'homepage',
                 controller: 'HomepageController',
                 templateUrl: '/templates/homepage.html',
                 requireLogin: false
             }, {
                 path: '/login',
+                pageName: 'login',
                 controller: 'LoginController',
                 templateUrl: '/templates/login.html',
                 requireLogin: false,
-                resolve: ['authenticationService', '$q', function(authenticationService, $q) {
+                resolve: { resolve: ['authenticationService', '$q', function(authenticationService, $q) {
                     console.log('Login resolved to :', !authenticationService.getUserAuthenticated());
                     if(authenticationService.getUserAuthenticated()){
                         return $q.reject('REDIRECT_HOME');
                     } else {
                         return $q.resolve();
                     }
-                }]
+                }]}
             }, {
                 path: '/secure-page',
+                pageName: 'secure-page',
                 controller: 'SecurePageController',
                 templateUrl: '/templates/secure-page.html',
                 requireLogin: true,
-                resolve: ['authenticationService', function(authenticationService) {
+                resolve: { resolve: ['authenticationService', function(authenticationService) {
                     return authenticationService.getUserData();
-                }]
+                }]}
             }
         ]
     })
@@ -42,18 +45,19 @@ angular.module('angularRouting', ['ngRoute'])
                 templateUrl: route.templateUrl
             };
 
-            if (angular.isDefined(route.resolve)) {
+            /*if (angular.isDefined(route.resolve)) {
                 routeObject.resolve = route.resolve;
-            }
+            }*/
 
-            $routeProvider.when(route.path, routeObject);
+            $routeProvider.when(route.path, route);
         }
 
         $routeProvider.otherwise({
             redirectTo: '/home'
         })
     }])
-    .run(['authenticationService', '$rootScope', '$location', 'loadingService', function(authenticationService, $rootScope, $location, loadingService) {
+    .run(['authenticationService', '$rootScope', '$location', 'loadingService',
+        function(authenticationService, $rootScope, $location, loadingService) {
         $rootScope.$on('$locationChangeSuccess', function() {
             console.log('$locationChangeSuccess');
             authenticationService.abortPreviousRequests();
@@ -76,7 +80,9 @@ angular.module('angularRouting', ['ngRoute'])
         });
 
         $rootScope.$on("$routeChangeSuccess", function(event, current, previous, eventObj) {
-            console.log('$routeChangeSuccess');
+            //console.log('$routeChangeSuccess');
+            console.log('current = ', current.$$route.pageName);
+            $rootScope.selectedPage = current.$$route.pageName;
             loadingService.stopLoading();
         });
     }]);

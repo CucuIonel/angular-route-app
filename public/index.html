@@ -26,9 +26,9 @@
         <div class="navbar-collapse collapse in" aria-expanded="true">
 
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#/home" class="navbar-link">Home</a></li>
-                <li><a href="#/login" class="navbar-link">Login</a></li>
-                <li><a href="#/secure-page" class="navbar-link">Secure page</a></li>
+                <li ng-class="{'active' : $root.selectedPage === 'homepage'}"><a href="#/home" class="navbar-link">Home</a></li>
+                <li ng-class="{'active' : $root.selectedPage === 'login'}"><a href="#/login" class="navbar-link">Login</a></li>
+                <li ng-class="{'active' : $root.selectedPage === 'secure-page'}"><a href="#/secure-page" class="navbar-link">Secure page</a></li>
             </ul>
         </div>
     </div>
